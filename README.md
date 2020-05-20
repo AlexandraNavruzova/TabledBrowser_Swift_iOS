@@ -1,4 +1,4 @@
-# EasyBrowser_Swift_iOS
+# TabledBrowser_Swift_iOS
 
 A project within the course Hacking With Swift.
 This is my solution to the challenge:
