@@ -12,8 +12,8 @@ import WebKit
 class ViewController: UIViewController, WKNavigationDelegate {
     var webView: WKWebView!
     var progressView: UIProgressView!
+    var webSiteToLoad: String?
 
-    var websites = ["apple.com", "hackingwithswift.com"]
 
     override func loadView() {
         webView = WKWebView()
@@ -24,11 +24,9 @@ class ViewController: UIViewController, WKNavigationDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let url = URL(string: "https://" + websites[0])!
+        let url = URL(string: "https://" + webSiteToLoad!)!
         webView.load(URLRequest(url: url))
         webView.allowsBackForwardNavigationGestures = true
-
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Open", style: .plain, target: self, action: #selector(openTapped))
 
         progressView = UIProgressView(progressViewStyle: .default)
         progressView.sizeToFit()
@@ -45,18 +43,6 @@ class ViewController: UIViewController, WKNavigationDelegate {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
     }
 
-    @objc func openTapped() {
-        let ac = UIAlertController(title: "Open page…", message: nil, preferredStyle: .actionSheet)
-
-        for website in websites {
-            ac.addAction(UIAlertAction(title: website, style: .default, handler: openPage))
-        }
-
-        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        ac.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
-        present(ac, animated: true)
-    }
-
     func openPage(action: UIAlertAction) {
         let url = URL(string: "https://" + action.title!)!
         webView.load(URLRequest(url: url))
@@ -70,11 +56,10 @@ class ViewController: UIViewController, WKNavigationDelegate {
         let url = navigationAction.request.url
 
         if let host = url?.host {
-            for website in websites {
-                if host.contains(website) {
-                    decisionHandler(.allow)
-                    return
-                }
+            if host.contains(webSiteToLoad!) {
+                decisionHandler(.allow)
+                
+                return
             }
             let ac = UIAlertController(title: "Opps", message: "This site is blocked", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Stay here", style: .cancel, handler: nil))
